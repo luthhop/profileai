@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProfileAI — Brandkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary:       #6C5CE7;
+    --primary-light: #a78bfa;
+    --primary-dark:  #4f46e5;
+    --primary-pale:  #ede9fe;
+    --ink:           #1a1a2e;
+    --ink-muted:     #4b5563;
+    --surface:       #f8f7ff;
+    --gray-100:      #f3f4f6;
+    --gray-200:      #e5e7eb;
+    --gray-500:      #6b7280;
+    --match-high:    #00b894;
+    --match-high-bg: #d1fae5;
+    --match-high-tx: #065f46;
+    --match-mid:     #f59e0b;
+    --match-mid-bg:  #fef3c7;
+    --match-mid-tx:  #92400e;
+    --match-low:     #ef4444;
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-body:    'Inter', sans-serif;
+    --radius-card:  16px;
+    --radius-btn:   10px;
+    --radius-badge: 20px;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: #f0effe;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  /* Page header */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .page-subtitle {
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+
+  /* Section */
+  .section { display: flex; flex-direction: column; gap: 16px; }
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    padding-bottom: 10px;
+    border-bottom: 0.5px solid var(--gray-200);
+  }
+
+  /* Card */
+  .card {
+    background: #fff;
+    border-radius: var(--radius-card);
+    border: 0.5px solid var(--gray-200);
+    padding: 24px;
+  }
+  .card-dark {
+    background: var(--ink);
+    border-radius: var(--radius-card);
+    padding: 24px;
+  }
+  .card-purple {
+    background: var(--surface);
+    border-radius: var(--radius-card);
+    border: 0.5px solid #ddd6fe;
+    padding: 24px;
+  }
+
+  /* Logo */
+  .logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width: 560px){ .logo-grid { grid-template-columns: 1fr; } }
+
+  .logo-lockup { display: flex; align-items: center; gap: 14px; }
+  .logo-mark {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark-purple {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark-circle {
+    width: 52px; height: 52px;
+    border-radius: 26px;
+    background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-name {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.6px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .logo-name span { color: var(--primary); }
+  .logo-name-w {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.6px;
+    color: #fff;
+    line-height: 1;
+  }
+  .logo-name-w span { color: var(--primary-light); }
+  .logo-tagline { font-size: 11px; font-weight: 500; color: var(--gray-500); margin-top: 3px; }
+  .logo-tagline-w { font-size: 11px; font-weight: 500; color: #9ca3af; margin-top: 3px; }
+
+  /* Symbol variations */
+  .symbol-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .symbol-box {
+    width: 72px; height: 72px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    border: 0.5px solid var(--gray-200);
+    background: var(--surface);
+  }
+  .symbol-box-dark { background: var(--ink); border: none; }
+  .symbol-box-purple { background: var(--primary); border: none; border-radius: 36px; }
+  .symbol-monogram {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 800;
+    color: var(--ink); letter-spacing: -.4px;
+  }
+  .symbol-monogram span { color: var(--primary); }
+
+  /* Colors */
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+  .swatch { border-radius: 12px; overflow: hidden; border: 0.5px solid rgba(0,0,0,.07); }
+  .swatch-color { height: 72px; }
+  .swatch-info { background: #fff; padding: 9px 11px; }
+  .swatch-name { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: var(--ink); }
+  .swatch-hex { font-size: 11px; color: var(--gray-500); font-family: monospace; margin-top: 1px; }
+  .swatch-role { font-size: 10px; color: var(--primary); font-weight: 500; margin-top: 1px; }
+
+  /* Typography */
+  .type-stack { display: flex; flex-direction: column; gap: 24px; }
+  .type-item { padding-bottom: 24px; border-bottom: 0.5px solid var(--gray-200); }
+  .type-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .type-meta { font-size: 10px; color: var(--gray-500); margin-bottom: 8px; font-family: monospace; }
+  .t-display { font-family: var(--font-display); font-size: 36px; font-weight: 800; color: var(--ink); letter-spacing: -.8px; line-height: 1.1; }
+  .t-display span { color: var(--primary); }
+  .t-h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--ink); letter-spacing: -.4px; }
+  .t-h2 { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--ink); }
+  .t-label { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--ink-muted); letter-spacing: .01em; }
+  .t-body { font-family: var(--font-body); font-size: 15px; color: var(--gray-500); line-height: 1.7; }
+  .t-caption { font-family: var(--font-body); font-size: 12px; color: var(--gray-500); }
+  .t-code { font-family: monospace; font-size: 13px; color: var(--primary); background: var(--primary-pale); padding: 6px 12px; border-radius: 8px; display: inline-block; }
+
+  /* Components */
+  .comp-section { display: flex; flex-direction: column; gap: 20px; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    font-family: var(--font-display);
+    font-size: 13px; font-weight: 600;
+    border-radius: var(--radius-btn);
+    padding: 10px 20px;
+    cursor: pointer; border: none;
+    transition: opacity .15s, transform .1s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { opacity: .88; }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+  .btn-ghost { background: var(--gray-100); color: var(--ink); }
+  .btn-sm { font-size: 12px; padding: 7px 14px; }
+  .btn-icon { width: 38px; height: 38px; padding: 0; justify-content: center; font-size: 16px; background: var(--primary-pale); color: var(--primary); }
+
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .badge {
+    font-family: var(--font-display);
+    font-size: 11px; font-weight: 600;
+    padding: 4px 11px; border-radius: var(--radius-badge);
+  }
+  .badge-purple { background: var(--primary-pale); color: var(--primary-dark); }
+  .badge-green { background: var(--match-high-bg); color: var(--match-high-tx); }
+  .badge-amber { background: var(--match-mid-bg); color: var(--match-mid-tx); }
+  .badge-gray { background: var(--gray-100); color: var(--ink-muted); }
+  .badge-dark { background: var(--ink); color: #fff; }
+
+  /* Job card */
+  .job-card {
+    background: var(--surface);
+    border: 0.5px solid #ddd6fe;
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .job-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); }
+  .job-meta { font-family: var(--font-body); font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .job-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .job-tag { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: var(--gray-100); color: var(--ink-muted); }
+  .job-score-hi { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--match-high); }
+  .job-score-mid { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--match-mid); }
+  .score-label { font-size: 10px; color: var(--gray-500); text-align: right; }
+  .match-bar { height: 5px; border-radius: 3px; background: var(--gray-200); margin-top: 4px; overflow: hidden; }
+  .match-fill-hi { height: 100%; border-radius: 3px; background: var(--match-high); }
+  .match-fill-mid { height: 100%; border-radius: 3px; background: var(--match-mid); }
+
+  /* Input */
+  .input-row { display: flex; flex-direction: column; gap: 8px; }
+  .input-field {
+    font-family: var(--font-body);
+    font-size: 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 10px 14px;
+    outline: none;
+    color: var(--ink);
+    background: #fff;
+    transition: border-color .15s;
+    width: 100%;
+  }
+  .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,92,231,.12); }
+  .input-label { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+
+  /* Tokens table */
+  .tokens-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width:500px){ .tokens-grid { grid-template-columns: 1fr; } }
+  .token-row { background: var(--gray-100); border-radius: 8px; padding: 10px 12px; }
+  .token-name { font-family: monospace; font-size: 10px; color: var(--gray-500); margin-bottom: 3px; }
+  .token-val { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--ink); }
+
+  /* Tailwind snippet */
+  .code-block {
+    background: var(--ink);
+    border-radius: 12px;
+    padding: 20px 22px;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: #e2e8f0;
+    overflow-x: auto;
+  }
+  .code-key { color: #a78bfa; }
+  .code-str { color: #6ee7b7; }
+  .code-comment { color: #4b5563; }
+
+  /* Footer */
+  .bk-footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--gray-500);
+    padding-top: 8px;
+    border-top: 0.5px solid var(--gray-200);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">ProfileAI · Brandkit v1.0</div>
+      <div class="page-subtitle">Identidade visual, cores, tipografia e componentes</div>
+    </div>
+    <div class="badge badge-purple">Junho 2026</div>
+  </div>
+
+  <!-- Logo principal -->
+  <div class="section">
+    <div class="section-label">Logo principal</div>
+    <div class="logo-grid">
+      <div class="card-purple">
+        <div class="logo-lockup">
+          <div class="logo-mark">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="4" width="11" height="11" rx="3" fill="#6C5CE7"/>
+              <rect x="17" y="4" width="11" height="11" rx="3" fill="#a78bfa" opacity=".7"/>
+              <rect x="4" y="17" width="11" height="11" rx="3" fill="#a78bfa" opacity=".5"/>
+              <rect x="17" y="17" width="11" height="11" rx="3" fill="#6C5CE7" opacity=".3"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-name">Profile<span>AI</span></div>
+            <div class="logo-tagline">sua carreira, acelerada por IA</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-dark">
+        <div class="logo-lockup">
+          <div class="logo-mark-purple">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="4" width="11" height="11" rx="3" fill="#fff"/>
+              <rect x="17" y="4" width="11" height="11" rx="3" fill="#fff" opacity=".6"/>
+              <rect x="4" y="17" width="11" height="11" rx="3" fill="#fff" opacity=".4"/>
+              <rect x="17" y="17" width="11" height="11" rx="3" fill="#fff" opacity=".2"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-name-w">Profile<span>AI</span></div>
+            <div class="logo-tagline-w">sua carreira, acelerada por IA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variações do símbolo -->
+  <div class="section">
+    <div class="section-label">Variações do símbolo</div>
+    <div class="card">
+      <div class="symbol-row">
+        <div class="symbol-box">
+          <div class="logo-mark" style="width:52px;height:52px;border-radius:14px">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="4" width="11" height="11" rx="3" fill="#6C5CE7"/>
+              <rect x="17" y="4" width="11" height="11" rx="3" fill="#a78bfa" opacity=".7"/>
+              <rect x="4" y="17" width="11" height="11" rx="3" fill="#a78bfa" opacity=".5"/>
+              <rect x="17" y="17" width="11" height="11" rx="3" fill="#6C5CE7" opacity=".3"/>
+            </svg>
+          </div>
+        </div>
+        <div class="symbol-box symbol-box-dark">
+          <div class="logo-mark-purple" style="width:52px;height:52px">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="4" width="11" height="11" rx="3" fill="#fff"/>
+              <rect x="17" y="4" width="11" height="11" rx="3" fill="#fff" opacity=".6"/>
+              <rect x="4" y="17" width="11" height="11" rx="3" fill="#fff" opacity=".4"/>
+              <rect x="17" y="17" width="11" height="11" rx="3" fill="#fff" opacity=".2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="symbol-box">
+          <div class="logo-mark-circle" style="width:52px;height:52px;border-radius:26px">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="4" width="11" height="11" rx="3" fill="#fff"/>
+              <rect x="17" y="4" width="11" height="11" rx="3" fill="#fff" opacity=".6"/>
+              <rect x="4" y="17" width="11" height="11" rx="3" fill="#fff" opacity=".4"/>
+              <rect x="17" y="17" width="11" height="11" rx="3" fill="#fff" opacity=".2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="symbol-box" style="width:72px;height:72px">
+          <div class="symbol-monogram">P<span>AI</span></div>
+        </div>
+        <div class="symbol-box symbol-box-dark" style="width:72px;height:72px">
+          <div class="symbol-monogram" style="color:#fff">P<span style="color:#a78bfa">AI</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paleta de cores -->
+  <div class="section">
+    <div class="section-label">Paleta de cores</div>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#6C5CE7"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Primary</div>
+          <div class="swatch-hex">#6C5CE7</div>
+          <div class="swatch-role">Cor principal, CTA</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#a78bfa"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Primary Light</div>
+          <div class="swatch-hex">#a78bfa</div>
+          <div class="swatch-role">Dark mode, acentos</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#4f46e5"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Primary Dark</div>
+          <div class="swatch-hex">#4f46e5</div>
+          <div class="swatch-role">Hover, pressed</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#ede9fe"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Primary Pale</div>
+          <div class="swatch-hex">#ede9fe</div>
+          <div class="swatch-role">Badges, backgrounds</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1a1a2e"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Ink</div>
+          <div class="swatch-hex">#1a1a2e</div>
+          <div class="swatch-role">Texto, dark bg</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f8f7ff"></div>
+        <div class="swatch-info" style="border-top:0.5px solid #e5e7eb">
+          <div class="swatch-name">Surface</div>
+          <div class="swatch-hex">#f8f7ff</div>
+          <div class="swatch-role">Cards, backgrounds</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#00b894"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Match High</div>
+          <div class="swatch-hex">#00b894</div>
+          <div class="swatch-role">Score 80%+</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f59e0b"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Match Mid</div>
+          <div class="swatch-hex">#f59e0b</div>
+          <div class="swatch-role">Score 60–79%</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#ef4444"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Match Low</div>
+          <div class="swatch-hex">#ef4444</div>
+          <div class="swatch-role">Score abaixo de 60%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tipografia -->
+  <div class="section">
+    <div class="section-label">Tipografia</div>
+    <div class="card">
+      <div class="type-stack">
+        <div class="type-item">
+          <div class="type-meta">Plus Jakarta Sans 800 · Display / Hero</div>
+          <div class="t-display">Sua carreira<br><span>acelerada por IA</span></div>
+        </div>
+        <div class="type-item">
+          <div class="type-meta">Plus Jakarta Sans 700 · H1</div>
+          <div class="t-h1">Vagas compatíveis com seu perfil</div>
+        </div>
+        <div class="type-item">
+          <div class="type-meta">Plus Jakarta Sans 600 · H2 / Subtítulo</div>
+          <div class="t-h2">Compatibilidade com a vaga · 92%</div>
+        </div>
+        <div class="type-item">
+          <div class="type-meta">Plus Jakarta Sans 600 · Label / Nav / Botão</div>
+          <div class="t-label">Otimizar LinkedIn · Gerar currículo · Ver vagas</div>
+        </div>
+        <div class="type-item">
+          <div class="type-meta">Inter 400 · Body text</div>
+          <div class="t-body">Analisamos seu perfil e encontramos as melhores vagas do mercado, com score de compatibilidade em tempo real. Você recebe explicações claras sobre o que você já tem e o que falta para cada vaga.</div>
+        </div>
+        <div class="type-item">
+          <div class="type-meta">Inter 400 · Caption / Meta</div>
+          <div class="t-caption">São Paulo · Remoto · CLT · Publicada há 2 dias</div>
+        </div>
+        <div class="type-item">
+          <div class="type-meta">Monospace · Código / Tokens</div>
+          <div class="t-code">--color-primary: #6C5CE7</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componentes -->
+  <div class="section">
+    <div class="section-label">Botões</div>
+    <div class="card">
+      <div class="btn-row">
+        <button class="btn btn-primary">Ver vagas compatíveis</button>
+        <button class="btn btn-outline">Otimizar LinkedIn</button>
+        <button class="btn btn-ghost">Gerar currículo PDF</button>
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary btn-sm">Aplicar agora</button>
+        <button class="btn btn-outline btn-sm">Salvar vaga</button>
+        <button class="btn btn-ghost btn-sm">Ver detalhes</button>
+        <button class="btn btn-icon">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Badges e tags</div>
+    <div class="card">
+      <div class="badge-row">
+        <span class="badge badge-purple">LinkedIn Coach</span>
+        <span class="badge badge-green">92% match</span>
+        <span class="badge badge-amber">67% match</span>
+        <span class="badge badge-gray">Dev Frontend</span>
+        <span class="badge badge-gray">React</span>
+        <span class="badge badge-gray">Remoto</span>
+        <span class="badge badge-dark">Pro</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Cards de vagas</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="job-card">
+        <div style="flex:1">
+          <div class="job-title">Dev Frontend React · Nubank</div>
+          <div class="job-meta">São Paulo · Remoto · CLT · Publicada há 3h</div>
+          <div class="job-tags">
+            <span class="job-tag">React</span>
+            <span class="job-tag">TypeScript</span>
+            <span class="job-tag">Node.js</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="job-score-hi">92%</div>
+          <div class="score-label">compatível</div>
+          <div class="match-bar" style="width:64px"><div class="match-fill-hi" style="width:92%"></div></div>
+        </div>
+      </div>
+      <div class="job-card" style="border-color:#fde68a">
+        <div style="flex:1">
+          <div class="job-title">Engenheiro de Software · iFood</div>
+          <div class="job-meta">São Paulo · Híbrido · CLT · Publicada há 1 dia</div>
+          <div class="job-tags">
+            <span class="job-tag">Java</span>
+            <span class="job-tag">Kafka</span>
+            <span class="job-tag">AWS</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="job-score-mid">67%</div>
+          <div class="score-label">compatível</div>
+          <div class="match-bar" style="width:64px"><div class="match-fill-mid" style="width:67%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Inputs</div>
+    <div class="card">
+      <div class="input-row">
+        <label class="input-label">Qual é o seu cargo atual ou desejado?</label>
+        <input class="input-field" type="text" placeholder="Ex: Desenvolvedor Frontend React">
+      </div>
+      <div class="input-row" style="margin-top:14px">
+        <label class="input-label">Suas principais habilidades técnicas</label>
+        <input class="input-field" type="text" placeholder="Ex: React, TypeScript, Node.js, Git...">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tokens Tailwind -->
+  <div class="section">
+    <div class="section-label">Design tokens · tailwind.config.js</div>
+    <div class="code-block"><span class="code-comment">// tailwind.config.js</span>
+<span class="code-key">module</span>.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary:        <span class="code-str">'#6C5CE7'</span>,
+        <span class="code-str">'primary-light'</span>: <span class="code-str">'#a78bfa'</span>,
+        <span class="code-str">'primary-dark'</span>:  <span class="code-str">'#4f46e5'</span>,
+        <span class="code-str">'primary-pale'</span>:  <span class="code-str">'#ede9fe'</span>,
+        ink:            <span class="code-str">'#1a1a2e'</span>,
+        surface:        <span class="code-str">'#f8f7ff'</span>,
+        <span class="code-str">'match-high'</span>:    <span class="code-str">'#00b894'</span>,
+        <span class="code-str">'match-mid'</span>:     <span class="code-str">'#f59e0b'</span>,
+        <span class="code-str">'match-low'</span>:     <span class="code-str">'#ef4444'</span>,
+      },
+      fontFamily: {
+        display: [<span class="code-str">'Plus Jakarta Sans'</span>, <span class="code-str">'sans-serif'</span>],
+        body:    [<span class="code-str">'Inter'</span>, <span class="code-str">'sans-serif'</span>],
+      },
+      borderRadius: {
+        card: <span class="code-str">'16px'</span>,
+        btn:  <span class="code-str">'10px'</span>,
+        badge: <span class="code-str">'20px'</span>,
+      },
+    },
+  },
+}
+
+<span class="code-comment">/* Google Fonts — adicionar no index.html */</span>
+<span class="code-comment">/* https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap */</span></div>
+  </div>
+
+  <div class="bk-footer">ProfileAI Brandkit v1.0 · Gerado em Junho 2026 · Uso interno</div>
+</div>
+</body>
+</html>
