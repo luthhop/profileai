@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { API } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -440,7 +441,7 @@ export default function Perfil() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/importar/pdf', {
+      const res = await fetch(`${API}/api/importar/pdf`, {
         method: 'POST',
         body: formData,
       });

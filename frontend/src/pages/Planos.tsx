@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { API } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -69,7 +70,7 @@ export default function Planos() {
       const token = session.data.session?.access_token;
       if (token) {
         try {
-          const res = await fetch('/api/stripe/subscription', {
+          const res = await fetch(`${API}/api/stripe/subscription`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {
@@ -90,7 +91,7 @@ export default function Planos() {
     try {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
-      const res = await fetch('/api/stripe/create-checkout', {
+      const res = await fetch(`${API}/api/stripe/create-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ email: user.email }),
@@ -107,7 +108,7 @@ export default function Planos() {
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token;
     try {
-      const res = await fetch('/api/stripe/portal', {
+      const res = await fetch(`${API}/api/stripe/portal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });

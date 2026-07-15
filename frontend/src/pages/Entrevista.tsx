@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { API } from '../lib/api';
 import AppLayout, { LogoMark } from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -186,7 +187,7 @@ export default function Entrevista() {
   }
 
   async function callApi(msgs: ChatMessage[]) {
-    const res = await fetch('/api/entrevista/chat', {
+    const res = await fetch(`${API}/api/entrevista/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profile, vaga_descricao: vagaDescricao || undefined, messages: msgs }),
@@ -272,7 +273,7 @@ export default function Entrevista() {
     setErrorPrep(null);
     try {
       const { data: fullProfile } = await supabase.from('profiles').select('*').eq('user_id', user!.id).maybeSingle();
-      const res = await fetch('/api/entrevista/preparacao', {
+      const res = await fetch(`${API}/api/entrevista/preparacao`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: fullProfile, vaga_descricao: prepVaga || undefined }),

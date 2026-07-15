@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { API } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -242,7 +243,7 @@ export default function Vagas() {
     setCurrentPage(1);
 
     try {
-      const res = await fetch('/api/vagas/search', {
+      const res = await fetch(`${API}/api/vagas/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keywords: keywords.trim(), location: location.trim() || undefined, profile }),
@@ -287,7 +288,7 @@ export default function Vagas() {
         status: 'salva',
       }),
       token
-        ? fetch('/api/candidaturas', {
+        ? fetch(`${API}/api/candidaturas`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({
@@ -313,12 +314,12 @@ export default function Vagas() {
       const descricao = stripHtml(vaga.descricao);
 
       const [linkedinRes, cvRes] = await Promise.all([
-        fetch('/api/linkedin/modo-alvo', {
+        fetch(`${API}/api/linkedin/modo-alvo`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profile: fullProfile, vaga: descricao }),
         }),
-        fetch('/api/cv/gerar-por-vaga', {
+        fetch(`${API}/api/cv/gerar-por-vaga`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profile: fullProfile, vaga: descricao }),

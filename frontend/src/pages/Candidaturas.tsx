@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { API } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -125,7 +126,7 @@ export default function Candidaturas() {
       const token = session.data.session?.access_token;
       if (!token) return;
 
-      const res = await fetch('/api/candidaturas', {
+      const res = await fetch(`${API}/api/candidaturas`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -146,7 +147,7 @@ export default function Candidaturas() {
     );
 
     try {
-      await fetch(`/api/candidaturas/${id}`, {
+      await fetch(`${API}/api/candidaturas/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: newStatus }),
@@ -163,7 +164,7 @@ export default function Candidaturas() {
 
     setSavingNotas(true);
     try {
-      await fetch(`/api/candidaturas/${id}`, {
+      await fetch(`${API}/api/candidaturas/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ notas: editNotas }),
@@ -184,7 +185,7 @@ export default function Candidaturas() {
     setSelectedId(null);
 
     try {
-      await fetch(`/api/candidaturas/${id}`, {
+      await fetch(`${API}/api/candidaturas/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -201,7 +202,7 @@ export default function Candidaturas() {
 
     setAdding(true);
     try {
-      const res = await fetch('/api/candidaturas', {
+      const res = await fetch(`${API}/api/candidaturas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
