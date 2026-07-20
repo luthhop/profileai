@@ -311,6 +311,9 @@ export default function Perfil() {
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -518,6 +521,30 @@ export default function Perfil() {
     } finally {
       setImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirmText !== 'EXCLUIR' || !user) return;
+    setDeleting(true);
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(`${API}/api/conta/excluir`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ erro: 'Erro desconhecido' }));
+        throw new Error(err.erro);
+      }
+      await supabase.auth.signOut();
+      navigate('/', { replace: true });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao excluir conta.');
+      setDeleting(false);
     }
   }
 
@@ -972,7 +999,66 @@ export default function Perfil() {
           </div>
         </Section>
 
+        {/* ── Zona de Perigo ──────────────────────────────────────────────── */}
+        <div className="mt-8 rounded-card border border-red-200 bg-red-50/50 p-6">
+          <h2 className="font-display text-lg font-bold text-red-600">Zona de perigo</h2>
+          <p className="mt-1 font-body text-sm text-red-500/80">
+            Ações irreversíveis. Após excluir sua conta, todos os dados serão permanentemente removidos.
+          </p>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="mt-4 rounded-btn bg-red-600 px-5 py-2.5 font-display text-sm font-semibold text-white transition hover:bg-red-700 active:scale-[.97]"
+          >
+            Excluir minha conta
+          </button>
+        </div>
+
       </div>
+
+      {/* Modal de confirmação */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-card bg-white p-6 shadow-xl">
+            <h3 className="font-display text-lg font-bold text-red-600">Excluir conta permanentemente</h3>
+            <p className="mt-2 font-body text-sm text-ink/70">
+              Esta ação é <strong>irreversível</strong>. Todos os seus dados serão apagados: perfil, otimizações do LinkedIn, vagas salvas, candidaturas e assinatura.
+            </p>
+            <p className="mt-4 font-body text-sm font-semibold text-ink">
+              Digite <span className="rounded bg-red-100 px-1.5 py-0.5 font-mono text-red-600">EXCLUIR</span> para confirmar:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={e => setDeleteConfirmText(e.target.value)}
+              placeholder="EXCLUIR"
+              className="mt-2 w-full rounded-btn border border-red-300 px-3 py-2.5 font-mono text-sm text-ink placeholder:text-gray-400 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              autoFocus
+            />
+            <div className="mt-5 flex items-center justify-end gap-3">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
+                className="rounded-btn border border-gray-200 px-4 py-2.5 font-display text-sm font-semibold text-ink/60 transition hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'EXCLUIR' || deleting}
+                className="rounded-btn bg-red-600 px-5 py-2.5 font-display text-sm font-semibold text-white transition hover:bg-red-700 active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deleting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Excluindo...
+                  </span>
+                ) : (
+                  'Excluir minha conta'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

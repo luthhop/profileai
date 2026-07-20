@@ -6,6 +6,7 @@ import rotasEntrevista from './entrevista';
 import rotasImportar from './importar';
 import rotasCandidaturas from './candidaturas';
 import rotasStripe from './stripe';
+import rotasConta from './conta';
 import { extractUrl } from '../utils/extractUrl';
 
 const rotas = Router();
@@ -18,6 +19,7 @@ rotas.use('/entrevista', rotasEntrevista);
 rotas.use('/importar', rotasImportar);
 rotas.use('/candidaturas', rotasCandidaturas);
 rotas.use('/stripe', rotasStripe);
+rotas.use('/conta', rotasConta);
 
 rotas.post('/extract-url', async (req, res) => {
   try {

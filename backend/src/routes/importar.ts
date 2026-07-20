@@ -112,8 +112,9 @@ rotasImportar.post('/pdf', upload.single('file'), async (req, res) => {
     }
 
     const uint8 = new Uint8Array(req.file.buffer.buffer, req.file.buffer.byteOffset, req.file.buffer.byteLength);
-    const parser = new PDFParse(uint8);
+    const parser = new PDFParse({ data: uint8 });
     const parsed = await parser.getText();
+    await parser.destroy();
     const textoExtraido = parsed.text.trim();
 
     if (textoExtraido.length < 50) {
