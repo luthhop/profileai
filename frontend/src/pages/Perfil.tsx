@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API } from '../lib/api';
+import { API, authFetch } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -444,7 +444,7 @@ export default function Perfil() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(`${API}/api/importar/pdf`, {
+      const res = await authFetch(`${API}/api/importar/pdf`, {
         method: 'POST',
         body: formData,
       });
@@ -528,13 +528,9 @@ export default function Perfil() {
     if (deleteConfirmText !== 'EXCLUIR' || !user) return;
     setDeleting(true);
     try {
-      const session = (await supabase.auth.getSession()).data.session;
-      const res = await fetch(`${API}/api/conta/excluir`, {
+      const res = await authFetch(`${API}/api/conta/excluir`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session?.access_token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ erro: 'Erro desconhecido' }));

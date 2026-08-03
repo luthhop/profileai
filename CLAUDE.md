@@ -133,3 +133,10 @@ Plataforma SaaS de carreira com IA para o mercado brasileiro. Ajuda profissionai
 - [x] Tela de planos /planos com comparativo e botão de upgrade
 - [x] Middleware de verificação de plano nas rotas premium
 - [x] Webhook Stripe para atualizar status da assinatura no Supabase
+
+### Sprint 16 — Segurança e Auth
+- [x] Verificação de JWT centralizada em backend/src/middleware/auth.ts usando supabase.auth.getUser() (substitui decodificação base64 insegura)
+- [x] Middleware requireAuth aplicado em todas as rotas de IA: /linkedin/*, /cv/*, /vagas/*, /entrevista/*, /importar/pdf, /extract-url
+- [x] Removido getUserId() duplicado de candidaturas.ts, stripe.ts, conta.ts, checkPlan.ts
+- [x] Frontend: authFetch() centralizado em lib/api.ts envia token automaticamente em todas as chamadas API
+- [x] checkPlan corrigido para bloquear usuários não autenticados (antes chamava next())

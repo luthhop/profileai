@@ -1,6 +1,7 @@
 import { Router, raw } from 'express';
 import Stripe from 'stripe';
 import { supabaseAdmin as supabase } from '../lib/supabase';
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth';
 
 const rotasStripe = Router();
 
@@ -15,21 +16,9 @@ function getStripe(): Stripe {
 
 const PRICE_PRO = process.env.STRIPE_PRICE_PRO_ID || '';
 
-function getUserId(req: { headers: Record<string, string | string[] | undefined> }): string | null {
-  const auth = req.headers.authorization;
-  if (!auth || typeof auth !== 'string') return null;
+rotasStripe.get('/subscription', requireAuth, async (req, res) => {
   try {
-    const payload = JSON.parse(Buffer.from(auth.split('.')[1], 'base64').toString());
-    return payload.sub ?? null;
-  } catch {
-    return null;
-  }
-}
-
-rotasStripe.get('/subscription', async (req, res) => {
-  try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { data } = await supabase
       .from('subscriptions')
@@ -44,10 +33,9 @@ rotasStripe.get('/subscription', async (req, res) => {
   }
 });
 
-rotasStripe.post('/create-checkout', async (req, res) => {
+rotasStripe.post('/create-checkout', requireAuth, async (req, res) => {
   try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { email } = req.body as { email?: string };
 
@@ -92,10 +80,9 @@ rotasStripe.post('/create-checkout', async (req, res) => {
   }
 });
 
-rotasStripe.post('/portal', async (req, res) => {
+rotasStripe.post('/portal', requireAuth, async (req, res) => {
   try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { data } = await supabase
       .from('subscriptions')

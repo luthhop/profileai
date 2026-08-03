@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { supabaseAdmin as supabase } from '../lib/supabase';
+import type { AuthenticatedRequest } from './auth';
 
 const FREE_LIMITS: Record<string, number> = {
   linkedin_generate: 1,
@@ -7,22 +8,14 @@ const FREE_LIMITS: Record<string, number> = {
   vagas_search: 3,
 };
 
-function getUserId(req: Request): string | null {
-  const auth = req.headers.authorization;
-  if (!auth || typeof auth !== 'string') return null;
-  try {
-    const payload = JSON.parse(Buffer.from(auth.split('.')[1], 'base64').toString());
-    return payload.sub ?? null;
-  } catch {
-    return null;
-  }
-}
-
 export function checkPlan(feature: string) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = getUserId(req);
-      if (!userId) { next(); return; }
+      const userId = (req as AuthenticatedRequest).userId;
+      if (!userId) {
+        res.status(401).json({ erro: 'Não autenticado' });
+        return;
+      }
 
       const { data: sub } = await supabase
         .from('subscriptions')

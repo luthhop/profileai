@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API } from '../lib/api';
+import { API, authFetch } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -66,19 +66,13 @@ export default function Planos() {
       if (!u) { navigate('/', { replace: true }); return; }
       setUser(u);
 
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
-      if (token) {
-        try {
-          const res = await fetch(`${API}/api/stripe/subscription`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            const data = await res.json();
-            setSub(data);
-          }
-        } catch { /* fallback to free */ }
-      }
+      try {
+        const res = await authFetch(`${API}/api/stripe/subscription`);
+        if (res.ok) {
+          const data = await res.json();
+          setSub(data);
+        }
+      } catch { /* fallback to free */ }
 
       setLoading(false);
     }
@@ -89,11 +83,9 @@ export default function Planos() {
     if (!user) return;
     setUpgrading(true);
     try {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
-      const res = await fetch(`${API}/api/stripe/create-checkout`, {
+      const res = await authFetch(`${API}/api/stripe/create-checkout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email }),
       });
       if (res.ok) {
@@ -105,12 +97,10 @@ export default function Planos() {
   }
 
   async function handleManage() {
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
     try {
-      const res = await fetch(`${API}/api/stripe/portal`, {
+      const res = await authFetch(`${API}/api/stripe/portal`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
       });
       if (res.ok) {
         const data = await res.json();

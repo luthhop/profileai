@@ -8,20 +8,21 @@ import rotasCandidaturas from './candidaturas';
 import rotasStripe from './stripe';
 import rotasConta from './conta';
 import { extractUrl } from '../utils/extractUrl';
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth';
 
 const rotas = Router();
 
 rotas.use('/perfil', rotasPerfil);
-rotas.use('/linkedin', rotasLinkedin);
-rotas.use('/vagas', rotasVagas);
-rotas.use('/cv', rotasCv);
-rotas.use('/entrevista', rotasEntrevista);
-rotas.use('/importar', rotasImportar);
+rotas.use('/linkedin', requireAuth, rotasLinkedin);
+rotas.use('/vagas', requireAuth, rotasVagas);
+rotas.use('/cv', requireAuth, rotasCv);
+rotas.use('/entrevista', requireAuth, rotasEntrevista);
+rotas.use('/importar', requireAuth, rotasImportar);
 rotas.use('/candidaturas', rotasCandidaturas);
 rotas.use('/stripe', rotasStripe);
 rotas.use('/conta', rotasConta);
 
-rotas.post('/extract-url', async (req, res) => {
+rotas.post('/extract-url', requireAuth, async (req, res) => {
   try {
     const { url } = req.body as { url: string };
     if (!url || typeof url !== 'string') {

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API } from '../lib/api';
+import { API, authFetch } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ export default function Curriculo() {
     setPreviewing(true);
     setError(null);
     try {
-      const res = await fetch(`${API}/api/cv/preview`, {
+      const res = await authFetch(`${API}/api/cv/preview`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile }),
@@ -158,7 +158,7 @@ export default function Curriculo() {
     setGenerating(true);
     setError(null);
     try {
-      const res = await fetch(`${API}/api/cv/generate`, {
+      const res = await authFetch(`${API}/api/cv/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile }),
@@ -180,7 +180,7 @@ export default function Curriculo() {
     setExtractingUrl(true);
     setErrorVaga(null);
     try {
-      const res = await fetch(`${API}/api/extract-url`, {
+      const res = await authFetch(`${API}/api/extract-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: vagaUrl.trim() }),
@@ -201,7 +201,7 @@ export default function Curriculo() {
     setPreviewingVaga(true);
     setErrorVaga(null);
     try {
-      const res = await fetch(`${API}/api/cv/preview-por-vaga`, {
+      const res = await authFetch(`${API}/api/cv/preview-por-vaga`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, vaga: vagaTexto }),
@@ -222,7 +222,7 @@ export default function Curriculo() {
     setGeneratingVaga(true);
     setErrorVaga(null);
     try {
-      const res = await fetch(`${API}/api/cv/gerar-por-vaga`, {
+      const res = await authFetch(`${API}/api/cv/gerar-por-vaga`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, vaga: vagaTexto }),
@@ -243,7 +243,7 @@ export default function Curriculo() {
     setExtractingCartaUrl(true);
     setErrorCarta(null);
     try {
-      const res = await fetch(`${API}/api/extract-url`, {
+      const res = await authFetch(`${API}/api/extract-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: cartaVagaUrl.trim() }),
@@ -263,7 +263,7 @@ export default function Curriculo() {
     setGeneratingCarta(true);
     setErrorCarta(null);
     try {
-      const res = await fetch(`${API}/api/cv/carta`, {
+      const res = await authFetch(`${API}/api/cv/carta`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, vaga: cartaVaga }),

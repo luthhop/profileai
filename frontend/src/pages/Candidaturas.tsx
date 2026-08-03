@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API } from '../lib/api';
+import { API, authFetch } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -122,13 +122,7 @@ export default function Candidaturas() {
 
   async function fetchCandidaturas(_u: User) {
     try {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
-      if (!token) return;
-
-      const res = await fetch(`${API}/api/candidaturas`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await authFetch(`${API}/api/candidaturas`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setCandidaturas(data);
@@ -138,18 +132,14 @@ export default function Candidaturas() {
   }
 
   async function updateStatus(id: string, newStatus: Status) {
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
-    if (!token) return;
-
     setCandidaturas(prev =>
       prev.map(c => c.id === id ? { ...c, status: newStatus } : c),
     );
 
     try {
-      await fetch(`${API}/api/candidaturas/${id}`, {
+      await authFetch(`${API}/api/candidaturas/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
     } catch {
@@ -158,15 +148,11 @@ export default function Candidaturas() {
   }
 
   async function saveNotas(id: string) {
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
-    if (!token) return;
-
     setSavingNotas(true);
     try {
-      await fetch(`${API}/api/candidaturas/${id}`, {
+      await authFetch(`${API}/api/candidaturas/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notas: editNotas }),
       });
       setCandidaturas(prev =>
@@ -177,17 +163,12 @@ export default function Candidaturas() {
   }
 
   async function deleteCandidatura(id: string) {
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
-    if (!token) return;
-
     setCandidaturas(prev => prev.filter(c => c.id !== id));
     setSelectedId(null);
 
     try {
-      await fetch(`${API}/api/candidaturas/${id}`, {
+      await authFetch(`${API}/api/candidaturas/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
       });
     } catch {
       if (user) await fetchCandidaturas(user);
@@ -196,15 +177,12 @@ export default function Candidaturas() {
 
   async function addCandidatura() {
     if (!addTitulo.trim()) return;
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
-    if (!token) return;
 
     setAdding(true);
     try {
-      const res = await fetch(`${API}/api/candidaturas`, {
+      const res = await authFetch(`${API}/api/candidaturas`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vaga_titulo: addTitulo.trim(),
           vaga_empresa: addEmpresa.trim() || null,

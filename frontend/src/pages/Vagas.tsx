@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API } from '../lib/api';
+import { API, authFetch } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -243,7 +243,7 @@ export default function Vagas() {
     setCurrentPage(1);
 
     try {
-      const res = await fetch(`${API}/api/vagas/search`, {
+      const res = await authFetch(`${API}/api/vagas/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keywords: keywords.trim(), location: location.trim() || undefined, profile }),
@@ -275,9 +275,6 @@ export default function Vagas() {
     if (!user || savedIds.has(vaga.id)) return;
     setSavingId(vaga.id);
 
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
-
     await Promise.all([
       supabase.from('vagas_salvas').insert({
         user_id: user.id,
@@ -287,19 +284,17 @@ export default function Vagas() {
         match_score: vaga.match_score,
         status: 'salva',
       }),
-      token
-        ? fetch(`${API}/api/candidaturas`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({
-              vaga_titulo: vaga.titulo,
-              vaga_empresa: vaga.empresa,
-              vaga_url: vaga.url,
-              match_score: vaga.match_score,
-              status: 'salva',
-            }),
-          }).catch(() => {})
-        : Promise.resolve(),
+      authFetch(`${API}/api/candidaturas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vaga_titulo: vaga.titulo,
+          vaga_empresa: vaga.empresa,
+          vaga_url: vaga.url,
+          match_score: vaga.match_score,
+          status: 'salva',
+        }),
+      }).catch(() => {}),
     ]);
 
     setSavedIds(prev => new Set(prev).add(vaga.id));
@@ -314,12 +309,12 @@ export default function Vagas() {
       const descricao = stripHtml(vaga.descricao);
 
       const [linkedinRes, cvRes] = await Promise.all([
-        fetch(`${API}/api/linkedin/modo-alvo`, {
+        authFetch(`${API}/api/linkedin/modo-alvo`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profile: fullProfile, vaga: descricao }),
         }),
-        fetch(`${API}/api/cv/gerar-por-vaga`, {
+        authFetch(`${API}/api/cv/gerar-por-vaga`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profile: fullProfile, vaga: descricao }),

@@ -1,23 +1,12 @@
 import { Router } from 'express';
 import { supabaseAdmin as supabase } from '../lib/supabase';
+import { requireAuth, getUserId, type AuthenticatedRequest } from '../middleware/auth';
 
 const rotasCandidaturas = Router();
 
-function getUserId(req: { headers: Record<string, string | string[] | undefined> }): string | null {
-  const auth = req.headers.authorization;
-  if (!auth || typeof auth !== 'string') return null;
+rotasCandidaturas.get('/', requireAuth, async (req, res) => {
   try {
-    const payload = JSON.parse(Buffer.from(auth.split('.')[1], 'base64').toString());
-    return payload.sub ?? null;
-  } catch {
-    return null;
-  }
-}
-
-rotasCandidaturas.get('/', async (req, res) => {
-  try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { data, error } = await supabase
       .from('candidaturas')
@@ -33,10 +22,9 @@ rotasCandidaturas.get('/', async (req, res) => {
   }
 });
 
-rotasCandidaturas.post('/', async (req, res) => {
+rotasCandidaturas.post('/', requireAuth, async (req, res) => {
   try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { vaga_titulo, vaga_empresa, vaga_url, match_score, status, notas } = req.body;
 
@@ -68,10 +56,9 @@ rotasCandidaturas.post('/', async (req, res) => {
   }
 });
 
-rotasCandidaturas.patch('/:id', async (req, res) => {
+rotasCandidaturas.patch('/:id', requireAuth, async (req, res) => {
   try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { id } = req.params;
     const updates: Record<string, unknown> = {};
@@ -103,10 +90,9 @@ rotasCandidaturas.patch('/:id', async (req, res) => {
   }
 });
 
-rotasCandidaturas.delete('/:id', async (req, res) => {
+rotasCandidaturas.delete('/:id', requireAuth, async (req, res) => {
   try {
-    const userId = getUserId(req);
-    if (!userId) { res.status(401).json({ erro: 'Não autenticado' }); return; }
+    const userId = (req as AuthenticatedRequest).userId;
 
     const { error } = await supabase
       .from('candidaturas')

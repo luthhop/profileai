@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API } from '../lib/api';
+import { API, authFetch } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -282,7 +282,7 @@ export default function LinkedinCoach() {
     setError(null);
 
     try {
-      const res = await fetch(`${API}/api/linkedin/generate`, {
+      const res = await authFetch(`${API}/api/linkedin/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile }),
@@ -316,7 +316,7 @@ export default function LinkedinCoach() {
     setExtractingUrl(true);
     setErrorAlvo(null);
     try {
-      const res = await fetch(`${API}/api/extract-url`, {
+      const res = await authFetch(`${API}/api/extract-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() }),
@@ -343,7 +343,7 @@ export default function LinkedinCoach() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      const res = await fetch(`${API}/api/linkedin/modo-alvo`, {
+      const res = await authFetch(`${API}/api/linkedin/modo-alvo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: fullProfile, vaga: vagaTexto }),
@@ -379,7 +379,7 @@ export default function LinkedinCoach() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      const res = await fetch(`${API}/api/linkedin/score`, {
+      const res = await authFetch(`${API}/api/linkedin/score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: fullProfile }),

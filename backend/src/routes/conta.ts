@@ -1,26 +1,12 @@
 import { Router } from 'express';
 import { supabaseAdmin } from '../lib/supabase';
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth';
 
 const rotasConta = Router();
 
-function getUserId(req: { headers: Record<string, string | string[] | undefined> }): string | null {
-  const auth = req.headers.authorization;
-  if (!auth || typeof auth !== 'string') return null;
+rotasConta.delete('/excluir', requireAuth, async (req, res) => {
   try {
-    const payload = JSON.parse(Buffer.from(auth.split('.')[1], 'base64').toString());
-    return payload.sub ?? null;
-  } catch {
-    return null;
-  }
-}
-
-rotasConta.delete('/excluir', async (req, res) => {
-  try {
-    const userId = getUserId(req);
-    if (!userId) {
-      res.status(401).json({ erro: 'Não autenticado' });
-      return;
-    }
+    const userId = (req as AuthenticatedRequest).userId;
 
     await supabaseAdmin.from('candidaturas').delete().eq('user_id', userId);
     await supabaseAdmin.from('vagas_salvas').delete().eq('user_id', userId);
