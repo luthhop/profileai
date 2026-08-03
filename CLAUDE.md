@@ -135,8 +135,35 @@ Plataforma SaaS de carreira com IA para o mercado brasileiro. Ajuda profissionai
 - [x] Webhook Stripe para atualizar status da assinatura no Supabase
 
 ### Sprint 16 — Segurança e Auth
-- [x] Verificação de JWT centralizada em backend/src/middleware/auth.ts usando supabase.auth.getUser() (substitui decodificação base64 insegura)
-- [x] Middleware requireAuth aplicado em todas as rotas de IA: /linkedin/*, /cv/*, /vagas/*, /entrevista/*, /importar/pdf, /extract-url
-- [x] Removido getUserId() duplicado de candidaturas.ts, stripe.ts, conta.ts, checkPlan.ts
-- [x] Frontend: authFetch() centralizado em lib/api.ts envia token automaticamente em todas as chamadas API
-- [x] checkPlan corrigido para bloquear usuários não autenticados (antes chamava next())
+- [x] Verificação JWT segura com supabase.auth.getUser() em todas as rotas
+- [x] Auth middleware centralizado em backend/src/middleware/auth.ts
+- [x] authFetch() no frontend — token automático em todas as chamadas
+- [x] checkPlan bloqueia anônimos corretamente
+
+## Tarefas pendentes — próximas sprints
+
+### Sprint 16 — Deploy funcional
+- [ ] Criar nixpacks.toml na pasta /backend com instalação do Chromium para Puppeteer funcionar no Railway
+- [ ] Adicionar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no frontend/.env.production
+- [ ] Verificar e corrigir CORS
+- [ ] Corrigir RLS de usage_counters no Supabase
+
+### Sprint 17 — Qualidade e completude
+- [ ] Centralizar getUserId() e extrairJson() em utils compartilhadas
+- [ ] Adicionar tratamento de erros do Supabase no frontend
+- [ ] Implementar filtros de salário e data nas vagas
+- [ ] Migrar histórico de entrevistas de localStorage para Supabase
+- [ ] Adicionar confirmação na exclusão de candidatura
+- [ ] Tornar exclusão de conta transacional
+
+### Sprint 18 — Monetização real
+- [ ] Aplicar checkPlan nas rotas premium
+- [ ] Configurar produtos e preços reais no Stripe dashboard
+- [ ] Adicionar variáveis Stripe no Railway
+- [ ] Testar fluxo completo Free → Pro
+
+### Sprint 19 — UX e onboarding
+- [ ] Substituir onboarding por tela com 3 opções: importar PDF LinkedIn, importar currículo, preencher manualmente
+- [ ] Melhorar campos cargo atual vs desejado no perfil
+- [ ] Drag-and-drop mobile no kanban
+- [ ] Score LinkedIn com breakdown visual
