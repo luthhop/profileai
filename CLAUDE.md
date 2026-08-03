@@ -1,5 +1,8 @@
 # ProfileAI — CLAUDE.md
 
+## Regra importante
+Antes de iniciar cada tarefa, verifique se há tokens suficientes para completá-la. Se estiver próximo do limite de contexto, pare, faça commit do que foi feito, atualize o CLAUDE.md marcando o que foi concluído, e avise o usuário antes de continuar.
+
 ## Sobre o projeto
 Plataforma SaaS de carreira com IA para o mercado brasileiro. Ajuda profissionais de qualquer área a otimizar LinkedIn, gerar currículo PDF, encontrar vagas compatíveis e praticar entrevistas.
 
