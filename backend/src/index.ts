@@ -13,9 +13,13 @@ const allowedOrigins = [
 ];
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) cb(null, true);
-    else cb(new Error('CORS not allowed'));
+    if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.up.railway.app'))) {
+      cb(null, true);
+    } else {
+      cb(new Error('CORS not allowed'));
+    }
   },
+  credentials: true,
 }));
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/stripe/webhook') {

@@ -146,10 +146,10 @@ Plataforma SaaS de carreira com IA para o mercado brasileiro. Ajuda profissionai
 ## Tarefas pendentes — próximas sprints
 
 ### Sprint 16 — Deploy funcional
-- [ ] Criar nixpacks.toml na pasta /backend com instalação do Chromium para Puppeteer funcionar no Railway
-- [ ] Adicionar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no frontend/.env.production
-- [ ] Verificar e corrigir CORS
-- [ ] Corrigir RLS de usage_counters no Supabase
+- [x] Criar nixpacks.toml na pasta /backend com instalação do Chromium para Puppeteer funcionar no Railway
+- [x] Adicionar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no frontend/.env.production
+- [x] Verificar e corrigir CORS
+- [x] Corrigir RLS de usage_counters no Supabase
 
 ### Sprint 17 — Qualidade e completude
 - [ ] Centralizar getUserId() e extrairJson() em utils compartilhadas

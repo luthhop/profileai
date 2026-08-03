@@ -527,6 +527,7 @@ function buildCvPorVagaHtml(p: ProfileData, ai: CvPorVagaAI): string {
 async function htmlToPdf(html: string): Promise<Buffer> {
   const browser = await puppeteer.launch({
     headless: 'shell',
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
