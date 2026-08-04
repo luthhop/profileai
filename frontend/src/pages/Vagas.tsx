@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch, apiError } from '../lib/api';
+import { API, authFetch, apiError, UpgradeRequiredError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -271,6 +271,7 @@ export default function Vagas() {
       setSearched(true);
       saveToHistory(keywords.trim(), location.trim());
     } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError(err instanceof Error && err.message ? err.message : 'Erro ao buscar vagas. Verifique sua conexão e tente novamente.');
     } finally {
       setSearching(false);

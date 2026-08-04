@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { extrairJson } from '../utils/extrairJson';
+import { checkPlan } from '../middleware/checkPlan';
 
 // ─── Perfil ──────────────────────────────────────────────────────────────────
 
@@ -97,7 +98,7 @@ Diretrizes:
 
 export const rotasLinkedin = Router();
 
-rotasLinkedin.post('/score', async (req, res) => {
+rotasLinkedin.post('/score', checkPlan('linkedin_score'), async (req, res) => {
   try {
     const { profile } = req.body as { profile: Record<string, unknown> };
     if (!profile) { res.status(400).json({ erro: 'Perfil não fornecido' }); return; }
@@ -118,7 +119,7 @@ rotasLinkedin.post('/score', async (req, res) => {
   }
 });
 
-rotasLinkedin.post('/generate', async (req, res) => {
+rotasLinkedin.post('/generate', checkPlan('linkedin_generate'), async (req, res) => {
   try {
     const { profile } = req.body as { profile: Record<string, unknown> };
 
@@ -149,7 +150,7 @@ rotasLinkedin.post('/generate', async (req, res) => {
   }
 });
 
-rotasLinkedin.post('/modo-alvo', async (req, res) => {
+rotasLinkedin.post('/modo-alvo', checkPlan('linkedin_modo_alvo'), async (req, res) => {
   try {
     const { profile, vaga } = req.body as { profile: Record<string, unknown>; vaga: string };
 

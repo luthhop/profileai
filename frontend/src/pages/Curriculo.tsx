@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch, apiError } from '../lib/api';
+import { API, authFetch, apiError, UpgradeRequiredError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -145,7 +145,8 @@ export default function Curriculo() {
       if (!res.ok) throw new Error(await apiError(res));
       const html = await res.text();
       setPreviewHtml(html);
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError('Erro ao gerar preview. Tente novamente.');
     } finally {
       setPreviewing(false);
@@ -167,7 +168,8 @@ export default function Curriculo() {
       const blob = await res.blob();
       downloadBlob(blob, `curriculo-${nameSlug()}.pdf`);
       setGenerated(true);
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError('Erro ao gerar o PDF. Tente novamente.');
     } finally {
       setGenerating(false);
@@ -209,7 +211,8 @@ export default function Curriculo() {
       if (!res.ok) throw new Error(await apiError(res));
       const html = await res.text();
       setPreviewVagaHtml(html);
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setErrorVaga('Erro ao gerar preview. Tente novamente.');
     } finally {
       setPreviewingVaga(false);
@@ -231,7 +234,8 @@ export default function Curriculo() {
       const blob = await res.blob();
       downloadBlob(blob, `curriculo-vaga-${nameSlug()}.pdf`);
       setGeneratedVaga(true);
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setErrorVaga('Erro ao gerar o PDF. Tente novamente.');
     } finally {
       setGeneratingVaga(false);
@@ -271,7 +275,8 @@ export default function Curriculo() {
       if (!res.ok) throw new Error(await apiError(res));
       const data = await res.json();
       setCartaResult(data);
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setErrorCarta('Erro ao gerar carta de apresentação. Tente novamente.');
     } finally {
       setGeneratingCarta(false);

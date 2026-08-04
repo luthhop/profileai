@@ -160,10 +160,10 @@ Plataforma SaaS de carreira com IA para o mercado brasileiro. Ajuda profissionai
 - [x] Tornar exclusão de conta transacional
 
 ### Sprint 18 — Monetização real
-- [ ] Aplicar checkPlan nas rotas premium
-- [ ] Configurar produtos e preços reais no Stripe dashboard
-- [ ] Adicionar variáveis Stripe no Railway
-- [ ] Testar fluxo completo Free → Pro
+- [x] Aplicar checkPlan nas rotas premium
+- [x] Configurar produtos e preços reais no Stripe dashboard
+- [x] Adicionar variáveis Stripe no Railway
+- [x] Testar fluxo completo Free → Pro
 
 ### Sprint 19 — UX e onboarding
 - [ ] Substituir onboarding por tela com 3 opções: importar PDF LinkedIn, importar currículo, preencher manualmente

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import puppeteer from 'puppeteer';
 import Anthropic from '@anthropic-ai/sdk';
 import { extrairJson } from '../utils/extrairJson';
+import { checkPlan } from '../middleware/checkPlan';
 
 const rotasCv = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -579,7 +580,7 @@ Retorne EXCLUSIVAMENTE um JSON válido — sem markdown, sem blocos de código, 
 
 // ─── Rota: CV Genérico ───────────────────────────────────────────────────────
 
-rotasCv.post('/generate', async (req, res) => {
+rotasCv.post('/generate', checkPlan('cv_generate'), async (req, res) => {
   try {
     const { profile } = req.body as { profile: ProfileData };
     if (!profile) {
@@ -622,7 +623,7 @@ rotasCv.post('/preview', (req, res) => {
 
 // ─── Rota: CV por Vaga (IA + PDF) ────────────────────────────────────────────
 
-rotasCv.post('/gerar-por-vaga', async (req, res) => {
+rotasCv.post('/gerar-por-vaga', checkPlan('cv_por_vaga'), async (req, res) => {
   try {
     const { profile, vaga } = req.body as { profile: ProfileData; vaga: string };
 
@@ -725,7 +726,7 @@ Retorne EXCLUSIVAMENTE um JSON válido — sem markdown — com:
   "assunto_email": "sugestão de assunto para email com máximo de 60 caracteres"
 }`;
 
-rotasCv.post('/carta', async (req, res) => {
+rotasCv.post('/carta', checkPlan('cv_carta'), async (req, res) => {
   try {
     const { profile, vaga } = req.body as { profile: Record<string, unknown>; vaga: string };
 

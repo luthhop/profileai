@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch, apiError } from '../lib/api';
+import { API, authFetch, apiError, UpgradeRequiredError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -298,7 +298,8 @@ export default function LinkedinCoach() {
         keywords: data.keywords,
         dicas: data.dicas,
       });
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError('Não foi possível gerar o conteúdo. Tente novamente.');
     } finally {
       setGenerating(false);
@@ -360,7 +361,8 @@ export default function LinkedinCoach() {
         dicas: [],
         vaga_alvo: vagaTexto.slice(0, 500),
       });
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setErrorAlvo('Não foi possível gerar a análise. Tente novamente.');
     } finally {
       setGeneratingAlvo(false);
@@ -387,7 +389,8 @@ export default function LinkedinCoach() {
       if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as ScoreResult;
       setScoreResult(data);
-    } catch {
+    } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setErrorScore('Erro ao calcular score. Tente novamente.');
     } finally {
       setGeneratingScore(false);

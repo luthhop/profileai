@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
+import { checkPlan } from '../middleware/checkPlan';
 
 const rotasEntrevista = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -98,7 +99,7 @@ Retorne EXCLUSIVAMENTE um JSON válido — sem markdown, sem blocos de código �
 Gere exatamente 6 perguntas comportamentais, 6 técnicas, 4 dicas de salário e 5 perguntas para o entrevistador.
 Todas devem ser específicas para o perfil e cargo/vaga do candidato, nunca genéricas.`;
 
-rotasEntrevista.post('/preparacao', async (req, res) => {
+rotasEntrevista.post('/preparacao', checkPlan('entrevista_preparacao'), async (req, res) => {
   try {
     const { profile, vaga_descricao } = req.body as {
       profile: Record<string, unknown>;

@@ -4,8 +4,13 @@ import type { AuthenticatedRequest } from './auth';
 
 const FREE_LIMITS: Record<string, number> = {
   linkedin_generate: 1,
+  linkedin_modo_alvo: 0,
+  linkedin_score: 0,
   cv_generate: 1,
+  cv_por_vaga: 0,
+  cv_carta: 0,
   vagas_search: 3,
+  entrevista_preparacao: 0,
 };
 
 export function checkPlan(feature: string) {
@@ -29,7 +34,16 @@ export function checkPlan(feature: string) {
       }
 
       const limit = FREE_LIMITS[feature];
-      if (!limit) { next(); return; }
+
+      if (limit === undefined) { next(); return; }
+
+      if (limit === 0) {
+        res.status(403).json({
+          erro: 'Recurso exclusivo do plano Pro. Faça upgrade para desbloquear.',
+          upgrade: true,
+        });
+        return;
+      }
 
       const { data: usage } = await supabase
         .from('usage_counters')

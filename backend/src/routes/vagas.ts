@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { extrairJson } from '../utils/extrairJson';
+import { checkPlan } from '../middleware/checkPlan';
 
 const rotasVagas = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -127,7 +128,7 @@ async function fetchJooblePages(
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-rotasVagas.post('/search', async (req, res) => {
+rotasVagas.post('/search', checkPlan('vagas_search'), async (req, res) => {
   try {
     const { keywords, location, profile, page = 1 } = req.body as {
       keywords: string;

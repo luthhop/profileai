@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch, apiError } from '../lib/api';
+import { API, authFetch, apiError, UpgradeRequiredError } from '../lib/api';
 import AppLayout, { LogoMark } from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -222,6 +222,7 @@ export default function Entrevista() {
       const data = await callApi(initialMsgs);
       setMessages([...initialMsgs, { role: 'assistant', content: data.response }]);
     } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError(err instanceof Error && err.message ? err.message : 'Erro ao iniciar entrevista. Tente novamente.');
       setPhase('setup');
     } finally {
@@ -246,6 +247,7 @@ export default function Entrevista() {
         saveSession(updated, vagaDescricao || undefined);
       }
     } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError(err instanceof Error && err.message ? err.message : 'Erro ao enviar mensagem. Tente novamente.');
     } finally {
       setSending(false);
@@ -265,6 +267,7 @@ export default function Entrevista() {
       setPhase('feedback');
       saveSession(updated, vagaDescricao || undefined);
     } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setError(err instanceof Error && err.message ? err.message : 'Erro ao gerar feedback. Tente novamente.');
     } finally {
       setSending(false);
@@ -298,6 +301,7 @@ export default function Entrevista() {
       const data = (await res.json()) as PrepResult;
       setPrepResult(data);
     } catch (err) {
+      if (err instanceof UpgradeRequiredError) { navigate('/planos'); return; }
       setErrorPrep(err instanceof Error && err.message ? err.message : 'Erro ao gerar material de preparação. Tente novamente.');
     } finally {
       setGeneratingPrep(false);
