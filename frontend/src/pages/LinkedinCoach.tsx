@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch } from '../lib/api';
+import { API, authFetch, apiError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -321,7 +321,7 @@ export default function LinkedinCoach() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as { texto: string };
       setVagaTexto(data.texto);
     } catch {
@@ -384,7 +384,7 @@ export default function LinkedinCoach() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: fullProfile }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as ScoreResult;
       setScoreResult(data);
     } catch {

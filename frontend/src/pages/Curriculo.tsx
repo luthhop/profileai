@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch } from '../lib/api';
+import { API, authFetch, apiError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const html = await res.text();
       setPreviewHtml(html);
     } catch {
@@ -163,7 +163,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const blob = await res.blob();
       downloadBlob(blob, `curriculo-${nameSlug()}.pdf`);
       setGenerated(true);
@@ -185,7 +185,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: vagaUrl.trim() }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as { texto: string };
       setVagaTexto(data.texto);
     } catch {
@@ -206,7 +206,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, vaga: vagaTexto }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const html = await res.text();
       setPreviewVagaHtml(html);
     } catch {
@@ -227,7 +227,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, vaga: vagaTexto }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const blob = await res.blob();
       downloadBlob(blob, `curriculo-vaga-${nameSlug()}.pdf`);
       setGeneratedVaga(true);
@@ -248,7 +248,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: cartaVagaUrl.trim() }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as { texto: string };
       setCartaVaga(data.texto);
     } catch {
@@ -268,7 +268,7 @@ export default function Curriculo() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, vaga: cartaVaga }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = await res.json();
       setCartaResult(data);
     } catch {

@@ -2,15 +2,11 @@ import { Router } from 'express';
 import multer from 'multer';
 import { PDFParse } from 'pdf-parse';
 import Anthropic from '@anthropic-ai/sdk';
+import { extrairJson } from '../utils/extrairJson';
 
 const rotasImportar = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
-
-function extrairJson(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return match ? match[1].trim() : text.trim();
-}
 
 const IMPORT_PROMPT = `Você é um especialista em análise de currículos e perfis profissionais brasileiros.
 

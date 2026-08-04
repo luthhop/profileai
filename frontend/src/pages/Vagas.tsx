@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch } from '../lib/api';
+import { API, authFetch, apiError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -160,6 +160,19 @@ const SCORE_FILTERS = [
 
 const CONTRATO_OPTIONS = ['Todos', 'CLT', 'PJ', 'Estágio'];
 const REGIME_OPTIONS = ['Todos', 'Remoto', 'Híbrido', 'Presencial'];
+const DATA_OPTIONS = [
+  { label: 'Qualquer', days: 0 },
+  { label: '24h', days: 1 },
+  { label: '7 dias', days: 7 },
+  { label: '30 dias', days: 30 },
+];
+const SALARIO_OPTIONS = [
+  { label: 'Qualquer', min: 0 },
+  { label: 'Com salário', min: -1 },
+  { label: 'R$3k+', min: 3000 },
+  { label: 'R$5k+', min: 5000 },
+  { label: 'R$10k+', min: 10000 },
+];
 const ITEMS_PER_PAGE = 20;
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -184,6 +197,8 @@ export default function Vagas() {
   const [minScore, setMinScore] = useState(0);
   const [filtroContrato, setFiltroContrato] = useState('Todos');
   const [filtroRegime, setFiltroRegime] = useState('Todos');
+  const [filtroData, setFiltroData] = useState(0);
+  const [filtroSalario, setFiltroSalario] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
 
   // Pagination
@@ -249,14 +264,14 @@ export default function Vagas() {
         body: JSON.stringify({ keywords: keywords.trim(), location: location.trim() || undefined, profile }),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as { vagas: Vaga[]; total: number };
       setVagas(data.vagas);
       setTotal(data.total);
       setSearched(true);
       saveToHistory(keywords.trim(), location.trim());
-    } catch {
-      setError('Erro ao buscar vagas. Verifique sua conexão e tente novamente.');
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Erro ao buscar vagas. Verifique sua conexão e tente novamente.');
     } finally {
       setSearching(false);
     }
@@ -353,6 +368,16 @@ export default function Vagas() {
     }
   }
 
+  function parseSalary(salario: string): number {
+    if (!salario) return 0;
+    const nums = salario.replace(/[^\d.,]/g, ' ').split(/\s+/).filter(Boolean);
+    for (const n of nums) {
+      const val = parseFloat(n.replace(/\./g, '').replace(',', '.'));
+      if (!isNaN(val) && val > 100) return val;
+    }
+    return 0;
+  }
+
   // Filtering
   const filteredVagas = vagas.filter(v => {
     if (v.match_score < minScore) return false;
@@ -369,6 +394,17 @@ export default function Vagas() {
       if (filtroRegime === 'Remoto' && !texto.includes('remoto') && !texto.includes('remote') && !texto.includes('home office')) return false;
       if (filtroRegime === 'Híbrido' && !texto.includes('híbrido') && !texto.includes('hibrido') && !texto.includes('hybrid')) return false;
       if (filtroRegime === 'Presencial' && !texto.includes('presencial') && !texto.includes('on-site') && !texto.includes('onsite')) return false;
+    }
+
+    if (filtroData > 0 && v.atualizada) {
+      const diffDays = (Date.now() - new Date(v.atualizada).getTime()) / (1000 * 60 * 60 * 24);
+      if (diffDays > filtroData) return false;
+    }
+
+    if (filtroSalario !== 0) {
+      const sal = parseSalary(v.salario);
+      if (filtroSalario === -1 && sal === 0) return false;
+      if (filtroSalario > 0 && sal < filtroSalario) return false;
     }
 
     return true;
@@ -501,6 +537,44 @@ export default function Vagas() {
                         }`}
                       >
                         {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-ink/30">Salário</span>
+                  <div className="flex gap-1">
+                    {SALARIO_OPTIONS.map(opt => (
+                      <button
+                        key={opt.min}
+                        type="button"
+                        onClick={() => { setFiltroSalario(opt.min); setCurrentPage(1); }}
+                        className={`rounded-badge px-2.5 py-1 font-body text-xs transition ${
+                          filtroSalario === opt.min
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-ink/50 hover:bg-gray-200'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-ink/30">Publicação</span>
+                  <div className="flex gap-1">
+                    {DATA_OPTIONS.map(opt => (
+                      <button
+                        key={opt.days}
+                        type="button"
+                        onClick={() => { setFiltroData(opt.days); setCurrentPage(1); }}
+                        className={`rounded-badge px-2.5 py-1 font-body text-xs transition ${
+                          filtroData === opt.days
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-ink/50 hover:bg-gray-200'
+                        }`}
+                      >
+                        {opt.label}
                       </button>
                     ))}
                   </div>

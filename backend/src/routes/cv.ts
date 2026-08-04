@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import puppeteer from 'puppeteer';
 import Anthropic from '@anthropic-ai/sdk';
+import { extrairJson } from '../utils/extrairJson';
 
 const rotasCv = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -97,11 +98,6 @@ function esc(text: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-}
-
-function extrairJson(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return match ? match[1].trim() : text.trim();
 }
 
 // ─── CSS compartilhado ───────────────────────────────────────────────────────

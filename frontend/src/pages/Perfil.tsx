@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch } from '../lib/api';
+import { API, authFetch, apiError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -450,8 +450,7 @@ export default function Perfil() {
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ erro: 'Erro desconhecido' }));
-        throw new Error(err.erro);
+        throw new Error(await apiError(res));
       }
 
       const data = await res.json();
@@ -533,8 +532,7 @@ export default function Perfil() {
         headers: { 'Content-Type': 'application/json' },
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ erro: 'Erro desconhecido' }));
-        throw new Error(err.erro);
+        throw new Error(await apiError(res));
       }
       await supabase.auth.signOut();
       navigate('/', { replace: true });

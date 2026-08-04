@@ -17,3 +17,18 @@ export async function authFetch(url: string, init: RequestInit = {}): Promise<Re
   }
   return fetch(url, { ...init, headers });
 }
+
+export async function apiError(res: Response): Promise<string> {
+  try {
+    const data = await res.json();
+    if (data.erro) return data.erro;
+    if (data.error) return data.error;
+    if (data.message) return data.message;
+  } catch { /* not JSON */ }
+
+  if (res.status === 401) return 'Sessão expirada. Faça login novamente.';
+  if (res.status === 403) return 'Você não tem permissão para esta ação. Verifique seu plano.';
+  if (res.status === 429) return 'Muitas requisições. Aguarde um momento e tente novamente.';
+  if (res.status >= 500) return 'Erro no servidor. Tente novamente em alguns instantes.';
+  return 'Erro inesperado. Tente novamente.';
+}

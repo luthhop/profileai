@@ -8,15 +8,19 @@ rotasConta.delete('/excluir', requireAuth, async (req, res) => {
   try {
     const userId = (req as AuthenticatedRequest).userId;
 
-    await supabaseAdmin.from('candidaturas').delete().eq('user_id', userId);
-    await supabaseAdmin.from('vagas_salvas').delete().eq('user_id', userId);
-    await supabaseAdmin.from('linkedin_outputs').delete().eq('user_id', userId);
-    await supabaseAdmin.from('subscriptions').delete().eq('user_id', userId);
-    await supabaseAdmin.from('profiles').delete().eq('user_id', userId);
+    const { error: rpcError } = await supabaseAdmin.rpc('delete_user_data', {
+      target_user_id: userId,
+    });
 
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
-    if (error) {
-      console.error('[conta/excluir] erro ao deletar auth user:', error);
+    if (rpcError) {
+      console.error('[conta/excluir] erro ao deletar dados:', rpcError);
+      res.status(500).json({ erro: 'Erro ao excluir dados da conta. Tente novamente.' });
+      return;
+    }
+
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (authError) {
+      console.error('[conta/excluir] erro ao deletar auth user:', authError);
       res.status(500).json({ erro: 'Erro ao excluir conta do sistema de autenticação.' });
       return;
     }

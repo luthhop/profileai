@@ -152,12 +152,12 @@ Plataforma SaaS de carreira com IA para o mercado brasileiro. Ajuda profissionai
 - [x] Corrigir RLS de usage_counters no Supabase
 
 ### Sprint 17 — Qualidade e completude
-- [ ] Centralizar getUserId() e extrairJson() em utils compartilhadas
-- [ ] Adicionar tratamento de erros do Supabase no frontend
-- [ ] Implementar filtros de salário e data nas vagas
-- [ ] Migrar histórico de entrevistas de localStorage para Supabase
-- [ ] Adicionar confirmação na exclusão de candidatura
-- [ ] Tornar exclusão de conta transacional
+- [x] Centralizar getUserId() e extrairJson() em utils compartilhadas
+- [x] Adicionar tratamento de erros do Supabase no frontend
+- [x] Implementar filtros de salário e data nas vagas
+- [x] Migrar histórico de entrevistas de localStorage para Supabase
+- [x] Adicionar confirmação na exclusão de candidatura
+- [x] Tornar exclusão de conta transacional
 
 ### Sprint 18 — Monetização real
 - [ ] Aplicar checkPlan nas rotas premium

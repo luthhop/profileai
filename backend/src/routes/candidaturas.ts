@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { supabaseAdmin as supabase } from '../lib/supabase';
-import { requireAuth, getUserId, type AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth';
 
 const rotasCandidaturas = Router();
 

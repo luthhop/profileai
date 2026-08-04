@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch } from '../lib/api';
+import { API, authFetch, apiError } from '../lib/api';
 import AppLayout from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -123,11 +123,11 @@ export default function Candidaturas() {
   async function fetchCandidaturas(_u: User) {
     try {
       const res = await authFetch(`${API}/api/candidaturas`);
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = await res.json();
       setCandidaturas(data);
-    } catch {
-      setError('Erro ao carregar candidaturas.');
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Erro ao carregar candidaturas.');
     }
   }
 
@@ -163,6 +163,10 @@ export default function Candidaturas() {
   }
 
   async function deleteCandidatura(id: string) {
+    const cand = candidaturas.find(c => c.id === id);
+    const nome = cand?.vaga_titulo || 'esta candidatura';
+    if (!window.confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`)) return;
+
     setCandidaturas(prev => prev.filter(c => c.id !== id));
     setSelectedId(null);
 

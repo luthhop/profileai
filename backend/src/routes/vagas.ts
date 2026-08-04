@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
+import { extrairJson } from '../utils/extrairJson';
 
 const rotasVagas = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -53,11 +54,6 @@ Critérios de pontuação:
 
 Retorne EXCLUSIVAMENTE um JSON válido — sem markdown, sem texto extra — neste formato:
 [{"id": "job_id", "score": 85, "motivo": "Stack React/Node alinhada, senioridade compatível"}]`;
-
-function extrairJson(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return match ? match[1].trim() : text.trim();
-}
 
 async function scoreChunk(
   profile: Record<string, unknown>,

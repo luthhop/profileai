@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
+import { extrairJson } from '../utils/extrairJson';
 
 // ─── Perfil ──────────────────────────────────────────────────────────────────
 
@@ -33,11 +34,6 @@ Diretrizes obrigatórias:
 - O about deve começar com uma primeira frase impactante e usar métricas quando disponíveis.
 - As keywords devem incluir variações de cargo, área, tecnologias e termos do setor.
 - As dicas devem ser específicas para este profissional, não conselhos genéricos de LinkedIn.`;
-
-function extrairJson(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return match ? match[1].trim() : text.trim();
-}
 
 const MODO_ALVO_PROMPT = `Você é um especialista de elite em LinkedIn, personal branding e recrutamento no mercado brasileiro, com 15+ anos posicionando profissionais estrategicamente para vagas específicas.
 

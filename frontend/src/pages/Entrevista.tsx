@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { API, authFetch } from '../lib/api';
+import { API, authFetch, apiError } from '../lib/api';
 import AppLayout, { LogoMark } from '../components/AppLayout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -161,20 +161,30 @@ export default function Entrevista() {
   }, [messages, sending]);
 
   async function loadSessions(userId: string) {
-    const saved = localStorage.getItem(`interview_sessions_${userId}`);
-    if (saved) {
-      try { setSessions(JSON.parse(saved)); } catch { /* ignore */ }
+    const { data } = await supabase
+      .from('interview_sessions')
+      .select('id, vaga, messages_count, score, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (data && data.length > 0) {
+      setSessions(data);
+    } else {
+      const saved = localStorage.getItem(`interview_sessions_${userId}`);
+      if (saved) {
+        try { setSessions(JSON.parse(saved)); } catch { /* ignore */ }
+      }
     }
   }
 
-  function saveSession(msgs: ChatMessage[], vaga: string | undefined) {
+  async function saveSession(msgs: ChatMessage[], vaga: string | undefined) {
     if (!user) return;
     const userMsgs = msgs.filter(m => m.role === 'user' && m.content !== 'FEEDBACK_FINAL' && m.content !== 'Olá, estou pronto para começar a entrevista.');
     const scoreMatch = msgs[msgs.length - 1]?.content.match(/(\d{1,3})\s*(?:\/\s*100|%|pontos)/);
     const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
 
     const session: SessionItem = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       vaga: vaga?.slice(0, 100) || null,
       messages_count: userMsgs.length,
       score,
@@ -183,7 +193,13 @@ export default function Entrevista() {
 
     const updated = [session, ...sessions].slice(0, 20);
     setSessions(updated);
-    localStorage.setItem(`interview_sessions_${user.id}`, JSON.stringify(updated));
+
+    await supabase.from('interview_sessions').insert({
+      user_id: user.id,
+      vaga: session.vaga,
+      messages_count: session.messages_count,
+      score: session.score,
+    });
   }
 
   async function callApi(msgs: ChatMessage[]) {
@@ -192,7 +208,7 @@ export default function Entrevista() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profile, vaga_descricao: vagaDescricao || undefined, messages: msgs }),
     });
-    if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error(await apiError(res));
     return (await res.json()) as { response: string; finished: boolean };
   }
 
@@ -205,8 +221,8 @@ export default function Entrevista() {
       const initialMsgs: ChatMessage[] = [{ role: 'user', content: 'Olá, estou pronto para começar a entrevista.' }];
       const data = await callApi(initialMsgs);
       setMessages([...initialMsgs, { role: 'assistant', content: data.response }]);
-    } catch {
-      setError('Erro ao iniciar entrevista. Tente novamente.');
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Erro ao iniciar entrevista. Tente novamente.');
       setPhase('setup');
     } finally {
       setSending(false);
@@ -229,8 +245,8 @@ export default function Entrevista() {
         setPhase('feedback');
         saveSession(updated, vagaDescricao || undefined);
       }
-    } catch {
-      setError('Erro ao enviar mensagem. Tente novamente.');
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Erro ao enviar mensagem. Tente novamente.');
     } finally {
       setSending(false);
       inputRef.current?.focus();
@@ -248,8 +264,8 @@ export default function Entrevista() {
       setMessages(updated);
       setPhase('feedback');
       saveSession(updated, vagaDescricao || undefined);
-    } catch {
-      setError('Erro ao gerar feedback. Tente novamente.');
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Erro ao gerar feedback. Tente novamente.');
     } finally {
       setSending(false);
     }
@@ -278,11 +294,11 @@ export default function Entrevista() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile: fullProfile, vaga_descricao: prepVaga || undefined }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(await apiError(res));
       const data = (await res.json()) as PrepResult;
       setPrepResult(data);
-    } catch {
-      setErrorPrep('Erro ao gerar material de preparação. Tente novamente.');
+    } catch (err) {
+      setErrorPrep(err instanceof Error && err.message ? err.message : 'Erro ao gerar material de preparação. Tente novamente.');
     } finally {
       setGeneratingPrep(false);
     }
